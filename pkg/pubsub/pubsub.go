@@ -8,10 +8,13 @@ type sub struct {
 }
 
 type pubSub struct {
-	subs []*sub // 订阅者列表
+	subs []*sub
 	sync.RWMutex
 }
 
+// Publish pass item to all the filtered subscribers by channel
+// Note that publish is always non-blocking so that the slow subscribe would't effect
+// Therefore client need use buffered channel so as that not to miss the event
 func (ps *pubSub) Publish(item interface{}) {
 	ps.RLock()
 	defer ps.RUnlock()
@@ -25,6 +28,7 @@ func (ps *pubSub) Publish(item interface{}) {
 	}
 }
 
+// Subscribe add a subscriber to the pub/sub system
 func (ps *pubSub) Subscribe(subChan chan interface{}, doneCh <-chan struct{}, filter func(entry interface{}) bool) {
 	ps.Lock()
 	defer ps.Unlock()
@@ -33,11 +37,13 @@ func (ps *pubSub) Subscribe(subChan chan interface{}, doneCh <-chan struct{}, fi
 		filter: filter,
 	}
 	ps.subs = append(ps.subs, s)
-
+	go func() {
+		<- doneCh
+		ps.Lock()
+		defer ps.Unlock()
+	}()
 }
 
 func New() *pubSub {
 	return &pubSub{}
 }
-
-

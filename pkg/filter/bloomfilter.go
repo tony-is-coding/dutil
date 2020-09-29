@@ -1,6 +1,6 @@
 package filter
 
-import "filesystem/pkg/murmur3"
+import "dutil/pkg/murmur3"
 
 const BitSize = 1 << 10 << 10
 
