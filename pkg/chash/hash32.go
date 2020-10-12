@@ -12,6 +12,8 @@ const (
 )
 
 type murmurHash struct {
+	blen int
+
 }
 
 func (m *murmurHash) Write(p []byte) (int, error) { return 0, nil }
@@ -71,8 +73,8 @@ func sum32(data []byte) uint32 {
 }
 
 /*
- 	simple and may not useful
- */
+	simple and may not useful
+*/
 func hashFunc(digest []byte, nTime int) uint32 {
 	rv := (uint32(digest[3+nTime]&0xFF) << 24) | ((uint32)(digest[2+nTime*4]&0xFF) << 16) |
 		((uint32)(digest[1+nTime*4]&0xFF) << 8) | (uint32(digest[0+nTime*4] & 0xFF))
